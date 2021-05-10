@@ -1,8 +1,9 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.ImageProcessing = {}));
-}(this, (function (exports) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+        typeof define === 'function' && define.amd ? define(['exports'], factory) :
+            (global = global || self, factory(global.ImageProcessing = {}));
+}(this, (function (exports) {
+    'use strict';
 
 
 
@@ -15,29 +16,29 @@
         this.bhandler = bhandler;
     }
 
-    Object.assign( ImageProcesser.prototype, {
+    Object.assign(ImageProcesser.prototype, {
 
-        apply_kernel: function(border = 'icrop') {
+        apply_kernel: function (border = 'icrop') {
             // Method to apply kernel over image (incomplete)
             // border: 'icrop' is for cropping image borders, 'extend' is for extending image border
             // You may create auxiliary functions/methods if you'd like
 
         },
 
-        apply_xform: function()  {
+        apply_xform: function () {
             // Method to apply affine transform through inverse mapping (incomplete)
             // You may create auxiliary functions/methods if you'd like
         },
 
-        update: function() {
+        update: function () {
             // Method to process image and present results
             var start = new Date().valueOf();
 
-            if(this.kernel != null) {
+            if (this.kernel != null) {
                 this.apply_kernel(this.bhandler);
             }
 
-            if(this.xform != null) {
+            if (this.xform != null) {
                 this.apply_xform();
             }
 
@@ -49,11 +50,10 @@
             document.getElementById('duration').textContent = '' + duration;
         }
 
-    } )
+    })
 
 
     exports.ImageProcesser = ImageProcesser;
-    
-    
-})));
 
+
+})));

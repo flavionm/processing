@@ -14,7 +14,7 @@ function loadImage(src) {
             H = ~~(size * $image.height / $image.width);
             W = ~~(size);
         }
-        
+
         // load images
         var img = nj.images.read($image);
         gray_img = nj.images.resize(img, H, W);
@@ -37,6 +37,8 @@ function loadImage(src) {
         document.getElementById('h').textContent = '' + gray_img.shape[0];
         document.getElementById('w').textContent = '' + gray_img.shape[1];
 
+        var imgprocesser = new ImageProcessing.ImageProcesser(gray_img, kernel);
+        imgprocesser.update();
     };
 
     $image.src = src;

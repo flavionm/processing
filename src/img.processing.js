@@ -23,6 +23,8 @@
             const filter_padding = 2 * filter_border;
             const filter_size = filter_padding + 1;
 
+            const laplace_filter = nj.int8([[0, -1, 0], [-1, 4, -1], [0, -1, 0]]);
+
             if (border === 'extend') {
                 const extended = nj.zeros([this.height + filter_padding, this.width + filter_padding, 4], 'uint8')
                 for (var y = 0; y < this.height + filter_padding; y++) {
@@ -43,18 +45,38 @@
             for (var y = filter_border; y < this.height - filter_border; y++) {
                 for (var x = filter_border; x < this.height - filter_border; x++) {
                     var filter = this.img.slice([y - filter_border, y + filter_border + 1], [x - filter_border, x + filter_border + 1]);
-                    var result = nj.zeros(4);
-                    result.set(3, 255);
-                    for (var i = 0; i < filter_size; i++) {
-                        for (var j = 0; j < filter_size; j++) {
-                            for (var k = 0; k < 3; k++) {
-                                result.set(k, result.get(k) + filter.get(i, j, k) / 9);
+
+                    if (this.kernel === 'box') {
+                        var result = nj.zeros(4);
+                        result.set(3, 255);
+
+                        for (var i = 0; i < filter_size; i++) {
+                            for (var j = 0; j < filter_size; j++) {
+                                for (var k = 0; k < 3; k++) {
+                                    result.set(k, result.get(k) + filter.get(i, j, k) / 9);
+                                }
                             }
                         }
-                    }
 
-                    for (var k = 0; k < 4; k++) {
-                        new_img.set(y, x, k, result.get(k));
+                        for (var k = 0; k < 4; k++) {
+                            new_img.set(y, x, k, result.get(k));
+                        }
+                    } else if (this.kernel === 'laplace') {
+                        var result = 0;
+
+                        for (var i = 0; i < filter_size; i++) {
+                            for (var j = 0; j < filter_size; j++) {
+                                const gray = 0.299 * filter.get(i, j, 0) + 0.587 * filter.get(i, j, 1) + 0.114 * filter.get(i, j, 2);
+                                result += gray * laplace_filter.get(i, j) / 4;
+                            }
+                        }
+
+                        result = 2 * Math.abs(result);
+
+                        for (var k = 0; k < 3; k++) {
+                            new_img.set(y, x, k, result);
+                        }
+                        new_img.set(y, x, k, 255);
                     }
                 }
             }

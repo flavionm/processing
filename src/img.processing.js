@@ -102,12 +102,60 @@
                 }
             }
 
-            this.img = new_img
+            this.img = new_img;
+            this.height = this.img.shape[0];
+            this.width = this.img.shape[1];
         },
 
         apply_xform: function () {
-            // Method to apply affine transform through inverse mapping (incomplete)
-            // You may create auxiliary functions/methods if you'd like
+            var a = this.xform.get(0, 0), b = this.xform.get(0, 1), c = this.xform.get(0, 2);
+            var d = this.xform.get(1, 0), e = this.xform.get(1, 1), f = this.xform.get(1, 2);
+            var g = this.xform.get(2, 0), h = this.xform.get(2, 1), i = this.xform.get(2, 2);
+            var A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
+            var D = -(b * i - c * h), E = a * i - c * g, F = -(a * h - b * g);
+            var G = b * f - c * e, H = -(a * f - c * d), I = a * e - b * d;
+            var det = a * A + b * B + c * C;
+            const inverse_xform = nj.zeros([3, 3]);
+            inverse_xform.set(0, 0, A / det);
+            inverse_xform.set(1, 0, B / det);
+            inverse_xform.set(2, 0, C / det);
+            inverse_xform.set(0, 1, D / det);
+            inverse_xform.set(1, 1, E / det);
+            inverse_xform.set(2, 1, F / det);
+            inverse_xform.set(0, 2, G / det);
+            inverse_xform.set(1, 2, H / det);
+            inverse_xform.set(2, 2, I / det);
+
+
+            const new_img = nj.zeros([3 * this.height, 3 * this.width, 4], 'uint8');
+
+            for (var y = -this.height; y < 2 * this.height; y++) {
+                for (var x = -this.width; x < 2 * this.width; x++) {
+                    var original = inverse_xform.dot(nj.array([x, y, 1]).T);
+                    var original_x = original.get(0), original_y = original.get(1);
+                    if (original_x < 0 || original_x >= this.width || original_y < 0 || original_y >= this.height) {
+                        new_img.set(y + this.height, x + this.width, [255, 255, 255, 255]);
+                    } else {
+                        for (var k = 0; k < 3; k++) {
+                            var low_x = Math.floor(original_x);
+                            var high_x = low_x + 1;
+                            var low_y = Math.floor(original_y);
+                            var high_y = low_y + 1;
+                            var a = original_x - low_x, b = original_y - low_y;
+
+                            var result = (1 - a) * (1 - b) * this.img.get(low_y, low_x, k) + a * (1 - b) * this.img.get(low_y, high_x, k)
+                                + a * b * this.img.get(high_y, high_x, k) + (1 - a) * b * this.img.get(high_y, low_x, k);
+
+                            new_img.set(y + this.height, x + this.width, k, result);
+                        }
+                        new_img.set(y + this.height, x + this.width, 3, 255);
+                    }
+                }
+            }
+
+            this.img = new_img;
+            this.height = this.img.shape[0];
+            this.width = this.img.shape[1];
         },
 
         update: function () {

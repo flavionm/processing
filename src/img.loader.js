@@ -1,6 +1,10 @@
 var size = 200;
 var gray_img;
 
+var kernel = null;
+var xform = null;
+var handler = null;
+
 function loadImage(src) {
     var $image = new Image();
     $image.crossOrigin = 'Anonymous';
@@ -37,7 +41,7 @@ function loadImage(src) {
         document.getElementById('h').textContent = '' + gray_img.shape[0];
         document.getElementById('w').textContent = '' + gray_img.shape[1];
 
-        var imgprocesser = new ImageProcessing.ImageProcesser(gray_img, kernel);
+        var imgprocesser = new ImageProcessing.ImageProcesser(gray_img, kernel, xform, handler);
         imgprocesser.update();
     };
 

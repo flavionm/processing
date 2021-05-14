@@ -75,7 +75,7 @@
                             }
                         }
 
-                        var result = 2 * Math.abs(Math.sqrt(result_x ** 2 + result_y ** 2));
+                        var result = Math.abs(Math.sqrt(result_x ** 2 + result_y ** 2));
 
                         for (var k = 0; k < 3; k++) {
                             new_img.set(y, x, k, result);
@@ -92,7 +92,7 @@
                             }
                         }
 
-                        result = 2 * Math.abs(result);
+                        result = Math.abs(result);
 
                         for (var k = 0; k < 3; k++) {
                             new_img.set(y, x, k, result);

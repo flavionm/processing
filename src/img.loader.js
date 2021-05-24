@@ -1,9 +1,6 @@
 var size = 200;
 var gray_img;
-
-var kernel = null;
-var xform = null;
-var handler = null;
+var img_load_flag = false;
 
 function loadImage(src) {
     var $image = new Image();
@@ -18,9 +15,9 @@ function loadImage(src) {
             H = ~~(size * $image.height / $image.width);
             W = ~~(size);
         }
-
+        
         // load images
-        var img = nj.images.read($image);
+        var img = nj.images.rgb2gray(nj.images.read($image));
         gray_img = nj.images.resize(img, H, W);
 
         // display images in canvas
@@ -37,12 +34,11 @@ function loadImage(src) {
         var duration = new Date().valueOf() - start;
         document.getElementById('duration').textContent = '' + duration;
         */
+        img_load_flag = true;
 
         document.getElementById('h').textContent = '' + gray_img.shape[0];
         document.getElementById('w').textContent = '' + gray_img.shape[1];
 
-        var imgprocesser = new ImageProcessing.ImageProcesser(gray_img, kernel, xform, handler);
-        imgprocesser.update();
     };
 
     $image.src = src;
@@ -57,5 +53,6 @@ function handleFileSelect(e) {
     };
     reader.readAsDataURL(file);
 }
+
 
 document.getElementById('file').addEventListener('change', handleFileSelect, false);
